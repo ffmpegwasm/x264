@@ -440,11 +440,6 @@ int x264_cpu_num_processors( void )
 #ifdef __ANDROID__
     // Android NDK does not expose sched_getaffinity
     return sysconf( _SC_NPROCESSORS_CONF );
-// @ref: https://github.com/AlexVestin/x264-wasm/blob/master/common/cpu.c#L443
-#elif __EMSCRIPTEN__
-    #include <emscripten/threading.h>
-    return emscripten_num_logical_cores();
-#else
     cpu_set_t p_aff;
     memset( &p_aff, 0, sizeof(p_aff) );
     if( sched_getaffinity( 0, sizeof(p_aff), &p_aff ) )
@@ -479,6 +474,7 @@ int x264_cpu_num_processors( void )
     return ncpu;
 
 #else
-    return 1;
+    #include <emscripten/threading.h>
+    return emscripten_num_logical_cores();
 #endif
 }
